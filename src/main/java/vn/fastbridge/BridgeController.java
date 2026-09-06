@@ -37,7 +37,7 @@ public final class BridgeController {
     public void start(int length, int width) {
         if (client.player == null || client.world == null) { message("Bridge unavailable: not in a world."); return; }
         if (length < 1 || length > config.maxLength || width < 1 || width > config.maxWidth) {
-            message("Usage: #bridge [length 1-" + config.maxLength + "] [width 1-" + config.maxWidth + "] | auto <width> | stop"); return;
+            message("Usage: #bridge [length 1-" + config.maxLength + "] [width 1-" + config.maxWidth + "] | auto <width> | F8 emergency stop"); return;
         }
         stopInternal(null, false);
         plan = planner.create(client.player, length, width);
@@ -48,7 +48,7 @@ public final class BridgeController {
         cameraLock.lock(client.player);
         process.setActive(true);
         process.setGoal(plan.orderedTargets().get(0));
-        message("Fast Bridge started: length=" + length + ", width=" + width + ". Predictive camera/input lock active. Baritone controls movement.");
+        message("Fast Bridge started: length=" + length + ", width=" + width + ". Predictive camera/input lock active. Press F8 for emergency stop. Baritone controls movement.");
     }
 
     /** Finds the first full-width solid row and bridges the gap before it. */
@@ -115,8 +115,6 @@ public final class BridgeController {
 
             var candidate = placement.candidate(client, target, plan.forward());
             if (candidate.isPresent()) {
-                // Predict the exact support face first, then snap the view to it in
-                // the same client tick. The mouse is blocked while the bridge owns the view.
                 cameraLock.aimAt(client.player, candidate.get().hit().getPos());
                 if (placement.interact(client, candidate.get())) {
                     pending = target;
