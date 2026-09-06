@@ -2,8 +2,10 @@ package vn.fastbridge;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 
-/** Locks the player's view direction while an automatic bridge is active. */
+/** Owns the view while the bridge is active and aims at the predicted placement face. */
 public final class BridgeCameraLock {
     private static volatile boolean globallyLocked;
 
@@ -19,6 +21,23 @@ public final class BridgeCameraLock {
             locked = true;
             globallyLocked = true;
         }
+        apply(player);
+    }
+
+    /** Instantly aim at the exact hit position selected by the placement planner. */
+    public void aimAt(ClientPlayerEntity player, Vec3d target) {
+        if (player == null || target == null) return;
+        if (!locked) lock(player);
+
+        Vec3d eye = player.getEyePos();
+        double dx = target.x - eye.x;
+        double dy = target.y - eye.y;
+        double dz = target.z - eye.z;
+        double horizontal = Math.sqrt(dx * dx + dz * dz);
+
+        yaw = (float) MathHelper.wrapDegrees(Math.toDegrees(Math.atan2(dz, dx)) - 90.0);
+        pitch = (float) (-Math.toDegrees(Math.atan2(dy, horizontal)));
+        pitch = MathHelper.clamp(pitch, -90.0f, 90.0f);
         apply(player);
     }
 
