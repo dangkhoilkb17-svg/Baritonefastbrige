@@ -1,3 +1,5 @@
-Place the official Baritone API jar here as:
-  baritone-api-1.11.2.jar
-Do not commit or redistribute it unless its license and distribution terms are satisfied.
+The repository already contains the Baritone 1.11.3 API jar:
+  baritone-api-1.11.3.jar
+
+It is used for compilation only. The runtime Baritone mod must be installed separately.
+Do not replace it with a different API version unless the source and build configuration are updated together.
