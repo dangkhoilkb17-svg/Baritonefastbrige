@@ -45,10 +45,15 @@ Do not install the repository's `libs/baritone-api-1.11.3.jar` as the runtime Ba
 - `#bridge`
 - `#bridge 100`
 - `#bridge 100 3`
+- `#bridge auto 3`
 - `#bridge stop`
-- `/bridge` forms are also available as Fabric client commands.
+- `/bridge` forms are also available as Fabric client commands, including `/bridge auto <width>`.
 
-Length is measured in rows. Total required placements are `length * width`. Width is perpendicular to the initial cardinal facing direction. Direction is locked when the command starts.
+Length is measured in rows. Total required placements are `length * width`. Width is perpendicular to the initial cardinal facing direction. When a bridge starts, the current camera yaw/pitch is locked until the bridge completes, fails, is cancelled, or the client disconnects.
+
+### Auto bridge
+
+`#bridge auto <width>` scans forward from the player's current floor position for the first row where every lane across the requested width contains a non-replaceable block. That row is treated as the opposite shore, and the addon builds all replaceable rows before it. The scan and resulting bridge length are capped by `maxLength`; it will not search or build indefinitely.
 
 ## Configuration
 
@@ -63,14 +68,15 @@ First launch creates `config/baritone-fast-bridge.json` with `defaultLength`, `d
 - `BridgeProcess` registers through Baritone's pathing control manager and requests a pause while active, preventing another Baritone process from fighting the forced inputs.
 - Placement uses `ClientPlayerInteractionManager.interactBlock`, one accepted interaction at most per client tick, followed by world-state verification and bounded retry.
 - Actual speed depends on latency, server tick rate, anticheat, reach validation, inventory, and placement acceptance. No fixed speed is promised.
+- While active, the camera is held at the start yaw/pitch so mouse movement cannot redirect the view during automated bridging.
 
 ## Known constraints
 
 - Straight, level, cardinal bridging only. No diagonal, staircase, jump-bridge, scaffold, or automatic inventory-screen swapping.
 - Odd widths center naturally. Even widths are biased one block to the clockwise side because a player cannot stand on a half-block centerline.
-- Camera is not forcibly rotated. The exact support face and hit vector are supplied to the normal interaction manager, avoiding camera snapping. Servers that require server-side view alignment may reject a placement; bounded retry then stops safely.
+- Auto mode requires a full-width non-replaceable shore row. Partial-width or irregular terrain is not treated as the destination shore.
 - The addon counts completion only from observed world block states, not from click acceptance.
 
 ## Safety testing checklist
 
-Test in a disposable local world first: `#bridge`, explicit length, width 3, stop, empty hotbar, obstructed target, forced placement failure, death, and disconnect. Multiplayer servers may disallow automation.
+Test in a disposable local world first: `#bridge`, explicit length, width 3, `#bridge auto 3`, stop, empty hotbar, obstructed target, forced placement failure, death, and disconnect. Multiplayer servers may disallow automation.
