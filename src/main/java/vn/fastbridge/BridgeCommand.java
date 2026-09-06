@@ -23,6 +23,9 @@ public final class BridgeCommand {
             literal("bridge")
                 .executes(ctx -> { controller.start(config.defaultLength, config.defaultWidth); return 1; })
                 .then(literal("stop").executes(ctx -> { controller.stop(); return 1; }))
+                .then(literal("auto")
+                    .then(argument("width", IntegerArgumentType.integer(1, config.maxWidth))
+                        .executes(ctx -> { controller.autoStart(IntegerArgumentType.getInteger(ctx, "width")); return 1; })))
                 .then(argument("length", IntegerArgumentType.integer(1, config.maxLength))
                     .executes(ctx -> { controller.start(IntegerArgumentType.getInteger(ctx, "length"), config.defaultWidth); return 1; })
                     .then(argument("width", IntegerArgumentType.integer(1, config.maxWidth))
@@ -36,6 +39,7 @@ public final class BridgeCommand {
             if (a.length == 0) controller.start(config.defaultLength, config.defaultWidth);
             else if (a.length == 1 && a[0].equalsIgnoreCase("stop")) controller.stop();
             else if (a.length == 1) controller.start(Integer.parseInt(a[0]), config.defaultWidth);
+            else if (a.length == 2 && a[0].equalsIgnoreCase("auto")) controller.autoStart(Integer.parseInt(a[1]));
             else if (a.length == 2) controller.start(Integer.parseInt(a[0]), Integer.parseInt(a[1]));
             else controller.start(-1, -1);
         } catch (NumberFormatException e) { controller.start(-1, -1); }
