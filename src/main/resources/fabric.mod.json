@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "id": "baritone_fast_bridge",
+  "version": "${version}",
+  "name": "Baritone Fast Bridge",
+  "description": "Predictive, safety-gated continuous bridging companion for Baritone.",
+  "authors": ["BaritoneFastBridge contributors"],
+  "license": "MIT",
+  "environment": "client",
+  "entrypoints": {
+    "client": ["vn.fastbridge.BaritoneFastBridge"]
+  },
+  "depends": {
+    "fabricloader": ">=0.16.0",
+    "minecraft": "~1.21.1",
+    "java": ">=21",
+    "fabric-api": "*",
+    "baritone": ">=1.11.2"
+  }
+}
