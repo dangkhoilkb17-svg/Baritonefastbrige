@@ -10,7 +10,8 @@ import org.slf4j.LoggerFactory;
 
 public final class BaritoneFastBridge implements ClientModInitializer {
     public static final Logger LOGGER = LoggerFactory.getLogger("baritone-fast-bridge");
-    private BridgeController controller;
+    private static BridgeController controller;
+
     @Override public void onInitializeClient() {
         BridgeConfig config = BridgeConfig.load();
         IBaritone baritone = BaritoneAPI.getProvider().getPrimaryBaritone();
@@ -19,5 +20,12 @@ public final class BaritoneFastBridge implements ClientModInitializer {
         ClientTickEvents.END_CLIENT_TICK.register(client -> controller.tick());
         ClientLifecycleEvents.CLIENT_STOPPING.register(client -> controller.disconnect());
         LOGGER.info("Baritone Fast Bridge initialized");
+    }
+
+    /** Emergency stop used by the hard input lock. F8 always releases bridge control. */
+    public static void emergencyStop() {
+        if (controller != null && controller.active()) {
+            controller.stop();
+        }
     }
 }
