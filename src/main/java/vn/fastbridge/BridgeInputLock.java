@@ -14,12 +14,12 @@ public final class BridgeInputLock {
 
     public static void lock(MinecraftClient client) {
         locked = true;
-        clearVanillaKeyStates(client);
+        clearVanillaKeyStates();
     }
 
     public static void unlock(MinecraftClient client) {
         locked = false;
-        clearVanillaKeyStates(client);
+        clearVanillaKeyStates();
     }
 
     public static boolean isLocked() {
@@ -27,10 +27,7 @@ public final class BridgeInputLock {
     }
 
     /** Clears physical vanilla key state without touching Baritone's input overrides. */
-    public static void clearVanillaKeyStates(MinecraftClient client) {
-        if (client == null || client.options == null) return;
-        for (KeyBinding key : client.options.allKeys) {
-            key.setPressed(false);
-        }
+    public static void clearVanillaKeyStates() {
+        KeyBinding.unpressAll();
     }
 }
