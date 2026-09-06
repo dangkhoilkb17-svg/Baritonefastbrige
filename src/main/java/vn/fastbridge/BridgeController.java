@@ -47,13 +47,10 @@ public final class BridgeController {
         cameraLock.lock(client.player);
         process.setActive(true);
         process.setGoal(plan.orderedTargets().get(0));
-        message("Fast Bridge started: length=" + length + ", width=" + width + ". Camera locked. Baritone controls movement.");
+        message("Fast Bridge started: length=" + length + ", width=" + width + ". Predictive camera lock active. Baritone controls movement.");
     }
 
-    /**
-     * Finds the first full-width solid row in front of the player and bridges every
-     * replaceable row before it. The configured maxLength is the safety cap.
-     */
+    /** Finds the first full-width solid row and bridges the gap before it. */
     public void autoStart(int width) {
         if (client.player == null || client.world == null) { message("Bridge unavailable: not in a world."); return; }
         if (width < 1 || width > config.maxWidth) {
@@ -81,9 +78,7 @@ public final class BridgeController {
 
     private int findAutoLength(BlockPos origin, Direction forward, Direction lateral, int width) {
         for (int row = 1; row <= config.maxLength + 1; row++) {
-            if (isFullWidthSolidRow(origin, forward, lateral, width, row)) {
-                return row - 1;
-            }
+            if (isFullWidthSolidRow(origin, forward, lateral, width, row)) return row - 1;
         }
         return config.maxLength + 1;
     }
@@ -107,7 +102,6 @@ public final class BridgeController {
         tick++;
         if (client.player == null || client.world == null) { fail(BridgeStopReason.DISCONNECTED); return; }
         if (!client.player.isAlive()) { fail(BridgeStopReason.PLAYER_DEAD); return; }
-        // Re-apply every client tick so mouse movement cannot rotate the camera while bridging.
         cameraLock.apply(client);
         try {
             if (!advancePastPlacedTarget()) return;
@@ -120,11 +114,13 @@ public final class BridgeController {
 
             var candidate = placement.candidate(client, target, plan.forward());
             if (candidate.isPresent()) {
+                // Predict the exact support face first, then snap the view to it in
+                // the same client tick. The mouse is blocked while the bridge owns the view.
+                cameraLock.aimAt(client.player, candidate.get().hit().getPos());
                 if (placement.interact(client, candidate.get())) {
                     pending = target;
                     pendingTick = tick;
                     currentAttempts = 0;
-                    // Immediately give Baritone the next goal. It decides how to move there.
                     if (currentIndex + 1 < plan.orderedTargets().size()) process.setGoal(plan.orderedTargets().get(currentIndex + 1));
                 } else if (++currentAttempts > config.placementRetryLimit) { fail(BridgeStopReason.NO_VALID_PLACEMENT); return; }
             } else if (++currentAttempts > config.placementRetryLimit) { fail(BridgeStopReason.NO_VALID_PLACEMENT); return; }
