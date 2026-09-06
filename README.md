@@ -1,6 +1,6 @@
 # Baritone Fast Bridge 1.21.1
 
-Client-side Fabric addon for Baritone 1.11.2. It plans a straight, cardinal bridge, places reachable cells predictively, and keeps movement active only while a configurable safety margin exists. It does not send custom placement packets, bypass server limits, or fork Baritone.
+Client-side Fabric addon for Baritone 1.11.3. It plans a straight, cardinal bridge, places reachable cells predictively, and keeps movement active only while a configurable safety margin exists. It does not send custom placement packets, bypass server limits, or fork Baritone.
 
 ## Requirements
 
@@ -8,30 +8,37 @@ Client-side Fabric addon for Baritone 1.11.2. It plans a straight, cardinal brid
 - Java 21
 - Fabric Loader 0.16.x
 - Fabric API for 1.21.1
-- Baritone 1.11.2 Fabric
+- Baritone 1.11.3 Fabric
 
-The official Baritone v1.11.2 release states support for Minecraft 1.21 and 1.21.1. For development, put the official `baritone-api-1.11.2.jar` in `libs/`. If absent, the build uses the verified Curse Maven mirror `curse.maven:baritone-bot-1119902:7673623` only as a compile-time artifact. The built addon does not bundle Baritone.
+For development, the repository includes the Baritone 1.11.3 API jar at `libs/baritone-api-1.11.3.jar`. The API jar is compile-time only; the built addon does not bundle Baritone itself.
 
 ## Build
 
-```bash
-# Recommended: download official baritone-api-1.11.2.jar and place it here
-mkdir -p libs
-cp /path/to/baritone-api-1.11.2.jar libs/
-./gradlew build
+On Windows, use the included bootstrap script:
+
+```bat
+gradlew.bat clean build
 ```
+
+On Linux/macOS:
+
+```bash
+./gradlew clean build
+```
+
+The Windows script downloads a clean Gradle 8.10.2 distribution when its local bootstrap copy is missing. This avoids depending on a broken or incomplete Gradle installation in `%USERPROFILE%\\.gradle`.
 
 Output: `build/libs/baritone-fast-bridge-1.0.0.jar`.
 
 ## Install
 
-Copy these three mods into `.minecraft/mods/`:
+Copy these mods into `.minecraft/mods/`:
 
 1. Fabric API for Minecraft 1.21.1
-2. Baritone 1.11.2 Fabric, preferably `baritone-api-fabric-1.11.2.jar` or the matching Fabric distribution
+2. Baritone 1.11.3 Fabric runtime distribution
 3. `baritone-fast-bridge-1.0.0.jar`
 
-Do not install the plain API-only jar as the runtime Baritone mod if it has no Fabric entrypoint. The local `libs/baritone-api-1.11.2.jar` is for compilation.
+Do not install the repository's `libs/baritone-api-1.11.3.jar` as the runtime Baritone mod; it is for compilation only.
 
 ## Commands
 
