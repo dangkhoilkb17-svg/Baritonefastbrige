@@ -44,10 +44,11 @@ public final class BridgeController {
         currentIndex = placed = currentAttempts = tick = 0;
         pending = null;
         state = BridgeState.PREPARING;
+        BridgeInputLock.lock(client);
         cameraLock.lock(client.player);
         process.setActive(true);
         process.setGoal(plan.orderedTargets().get(0));
-        message("Fast Bridge started: length=" + length + ", width=" + width + ". Predictive camera lock active. Baritone controls movement.");
+        message("Fast Bridge started: length=" + length + ", width=" + width + ". Predictive camera/input lock active. Baritone controls movement.");
     }
 
     /** Finds the first full-width solid row and bridges the gap before it. */
@@ -149,6 +150,7 @@ public final class BridgeController {
     private void stopInternal(BridgeStopReason reason, boolean report) {
         process.setActive(false);
         cameraLock.unlock();
+        BridgeInputLock.unlock(client);
         if (report && reason != null) message("Bridge stopped. Placed: " + placed + ". Reason: " + reason.message() + ".");
         state = BridgeState.IDLE;
         pending = null; plan = null; currentIndex = currentAttempts = 0;
