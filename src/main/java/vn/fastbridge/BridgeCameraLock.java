@@ -5,6 +5,8 @@ import net.minecraft.client.network.ClientPlayerEntity;
 
 /** Locks the player's view direction while an automatic bridge is active. */
 public final class BridgeCameraLock {
+    private static volatile boolean globallyLocked;
+
     private boolean locked;
     private float yaw;
     private float pitch;
@@ -15,6 +17,7 @@ public final class BridgeCameraLock {
             yaw = player.getYaw();
             pitch = player.getPitch();
             locked = true;
+            globallyLocked = true;
         }
         apply(player);
     }
@@ -33,9 +36,14 @@ public final class BridgeCameraLock {
 
     public void unlock() {
         locked = false;
+        globallyLocked = false;
     }
 
     public boolean isLocked() {
         return locked;
+    }
+
+    public static boolean isGloballyLocked() {
+        return globallyLocked;
     }
 }
