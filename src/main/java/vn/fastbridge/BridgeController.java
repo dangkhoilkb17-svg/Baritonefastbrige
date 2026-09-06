@@ -4,6 +4,7 @@ import baritone.api.IBaritone;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 
 public final class BridgeController {
     private final MinecraftClient client = MinecraftClient.getInstance();
@@ -13,6 +14,7 @@ public final class BridgeController {
     private final BridgePlacementController placement;
     private final BridgeSafetyManager safety;
     private final BridgeProcess process;
+    private final BridgeCameraLock cameraLock = new BridgeCameraLock();
     private BridgeState state = BridgeState.IDLE;
     private BridgePlan plan;
     private BlockPos pending;
@@ -35,16 +37,66 @@ public final class BridgeController {
     public void start(int length, int width) {
         if (client.player == null || client.world == null) { message("Bridge unavailable: not in a world."); return; }
         if (length < 1 || length > config.maxLength || width < 1 || width > config.maxWidth) {
-            message("Usage: #bridge [length 1-" + config.maxLength + "] [width 1-" + config.maxWidth + "] | stop"); return;
+            message("Usage: #bridge [length 1-" + config.maxLength + "] [width 1-" + config.maxWidth + "] | auto <width> | stop"); return;
         }
         stopInternal(null, false);
         plan = planner.create(client.player, length, width);
         currentIndex = placed = currentAttempts = tick = 0;
         pending = null;
         state = BridgeState.PREPARING;
+        cameraLock.lock(client.player);
         process.setActive(true);
         process.setGoal(plan.orderedTargets().get(0));
-        message("Fast Bridge started: length=" + length + ", width=" + width + ". Baritone controls movement.");
+        message("Fast Bridge started: length=" + length + ", width=" + width + ". Camera locked. Baritone controls movement.");
+    }
+
+    /**
+     * Finds the first full-width solid row in front of the player and bridges every
+     * replaceable row before it. The configured maxLength is the safety cap.
+     */
+    public void autoStart(int width) {
+        if (client.player == null || client.world == null) { message("Bridge unavailable: not in a world."); return; }
+        if (width < 1 || width > config.maxWidth) {
+            message("Usage: #bridge auto [width 1-" + config.maxWidth + "]"); return;
+        }
+
+        stopInternal(null, false);
+        Direction forward = client.player.getHorizontalFacing();
+        Direction lateral = forward.rotateYClockwise();
+        BlockPos origin = client.player.getBlockPos().down();
+        int length = findAutoLength(origin, forward, lateral, width);
+
+        if (length < 1) {
+            message("Auto bridge stopped: no gap found immediately ahead.");
+            return;
+        }
+        if (length > config.maxLength) {
+            message("Auto bridge stopped: no full-width shore found within maxLength=" + config.maxLength + ".");
+            return;
+        }
+
+        start(length, width);
+        if (active()) message("Auto bridge detected gap length=" + length + ", width=" + width + ".");
+    }
+
+    private int findAutoLength(BlockPos origin, Direction forward, Direction lateral, int width) {
+        for (int row = 1; row <= config.maxLength + 1; row++) {
+            if (isFullWidthSolidRow(origin, forward, lateral, width, row)) {
+                return row - 1;
+            }
+        }
+        return config.maxLength + 1;
+    }
+
+    private boolean isFullWidthSolidRow(BlockPos origin, Direction forward, Direction lateral, int width, int row) {
+        BlockPos rowOrigin = origin.offset(forward, row);
+        int center = width / 2;
+        for (int lane = 0; lane < width; lane++) {
+            int offset = lane - center;
+            BlockPos pos = rowOrigin.offset(lateral, offset);
+            if (client.world.getBlockState(pos).isReplaceable()) return false;
+        }
+        return true;
     }
 
     public void stop() { stopInternal(BridgeStopReason.CANCELLED, true); }
@@ -55,6 +107,8 @@ public final class BridgeController {
         tick++;
         if (client.player == null || client.world == null) { fail(BridgeStopReason.DISCONNECTED); return; }
         if (!client.player.isAlive()) { fail(BridgeStopReason.PLAYER_DEAD); return; }
+        // Re-apply every client tick so mouse movement cannot rotate the camera while bridging.
+        cameraLock.apply(client);
         try {
             if (!advancePastPlacedTarget()) return;
             if (currentIndex >= plan.orderedTargets().size()) { stopInternal(BridgeStopReason.COMPLETED, true); return; }
@@ -98,6 +152,7 @@ public final class BridgeController {
 
     private void stopInternal(BridgeStopReason reason, boolean report) {
         process.setActive(false);
+        cameraLock.unlock();
         if (report && reason != null) message("Bridge stopped. Placed: " + placed + ". Reason: " + reason.message() + ".");
         state = BridgeState.IDLE;
         pending = null; plan = null; currentIndex = currentAttempts = 0;
