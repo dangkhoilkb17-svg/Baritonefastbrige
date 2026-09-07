@@ -1,7 +1,7 @@
 package vn.fastbridge;
 
-import baritone.api.BaritoneAPI;
 import baritone.api.IBaritone;
+import baritone.api.IBaritoneProvider;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -14,12 +14,22 @@ public final class BaritoneFastBridge implements ClientModInitializer {
 
     @Override public void onInitializeClient() {
         BridgeConfig config = BridgeConfig.load();
-        IBaritone baritone = BaritoneAPI.getProvider().getPrimaryBaritone();
+        IBaritoneProvider provider = loadBaritoneProvider();
+        IBaritone baritone = provider.getPrimaryBaritone();
         controller = new BridgeController(baritone, config);
         new BridgeCommand(controller, config).register();
         ClientTickEvents.END_CLIENT_TICK.register(client -> controller.tick());
         ClientLifecycleEvents.CLIENT_STOPPING.register(client -> controller.disconnect());
         LOGGER.info("Baritone Fast Bridge initialized");
+    }
+
+    private static IBaritoneProvider loadBaritoneProvider() {
+        try {
+            Class<?> providerClass = Class.forName("baritone.BaritoneProvider");
+            return (IBaritoneProvider) providerClass.getDeclaredConstructor().newInstance();
+        } catch (ReflectiveOperationException | ClassCastException e) {
+            throw new IllegalStateException("Baritone runtime provider is unavailable", e);
+        }
     }
 
     /** Emergency stop used by the hard input lock. F8 always releases bridge control. */

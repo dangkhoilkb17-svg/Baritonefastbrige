@@ -86,9 +86,8 @@ public final class BridgeController {
 
     private boolean isFullWidthSolidRow(BlockPos origin, Direction forward, Direction lateral, int width, int row) {
         BlockPos rowOrigin = origin.offset(forward, row);
-        int center = width / 2;
         for (int lane = 0; lane < width; lane++) {
-            int offset = lane - center;
+            int offset = lane - ((width - 1) / 2);
             BlockPos pos = rowOrigin.offset(lateral, offset);
             if (client.world.getBlockState(pos).isReplaceable()) return false;
         }

@@ -19,8 +19,9 @@ dependencies {
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-    // Compile against the Fabric-compatible Baritone API.
-    compileOnly baritoneApiJar
+    // Baritone API Fabric is also the runtime integration mod. Do not use
+    // the standalone Baritone jar with this addon.
+    modImplementation baritoneApiJar
 }
 
 processResources {
