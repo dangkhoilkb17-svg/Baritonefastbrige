@@ -11,8 +11,8 @@ repositories {
     maven { url = 'https://maven.fabricmc.net/' }
 }
 
-// The standalone Fabric runtime does not include baritone/api classes.
-// This API jar is embedded in the addon so the runtime integration resolves.
+// The standalone Fabric runtime provides the implementation, while this API
+// jar supplies the compile-time interfaces that Loom remaps for Minecraft.
 def baritoneApiJar = files('libs/baritone-api-1.11.3.jar')
 
 dependencies {
@@ -21,7 +21,7 @@ dependencies {
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-    // Compile against the Baritone API; the API is also embedded below.
+    // Compile against the Baritone API; selected interfaces are embedded below.
     compileOnly baritoneApiJar
 }
 
@@ -43,6 +43,9 @@ java {
 jar {
     from(zipTree(baritoneApiJar.singleFile)) {
         exclude 'META-INF/**'
+        exclude 'baritone/api/BaritoneAPI.class'
+        exclude 'baritone/api/Settings*.class'
+        exclude 'baritone/api/utils/SettingsUtil*.class'
     }
     from('LICENSE') { rename { "${it}_${project.base.archivesName.get()}" } }
 }
