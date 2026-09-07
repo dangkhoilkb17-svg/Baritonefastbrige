@@ -11,7 +11,9 @@ repositories {
     maven { url = 'https://maven.fabricmc.net/' }
 }
 
-def baritoneApiJar = files('libs/baritone-api-1.11.3.jar')
+// Baritone's Fabric API must be supplied separately in libs/.
+// Do NOT bundle/include this JAR into the FastBridge mod.
+def baritoneApiFabricJar = files('libs/baritone-api-fabric-1.11.3.jar')
 
 dependencies {
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
@@ -19,9 +21,9 @@ dependencies {
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-    // Compile against the exact Baritone 1.11.3 API used by the source.
-    // Baritone itself remains a separate runtime mod in the mods folder.
-    compileOnly baritoneApiJar
+    // Compile against the Fabric-compatible Baritone API.
+    // Baritone remains a separate runtime mod in the mods folder.
+    compileOnly baritoneApiFabricJar
 }
 
 processResources {
