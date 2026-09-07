@@ -14,7 +14,8 @@ public final class BridgeCommand {
     public void register() {
         ClientSendMessageEvents.ALLOW_CHAT.register(message -> {
             String trimmed = message.trim();
-            if (!trimmed.toLowerCase(java.util.Locale.ROOT).startsWith("#bridge")) return true;
+            String normalized = trimmed.toLowerCase(java.util.Locale.ROOT);
+            if (!(normalized.equals("#bridge") || normalized.startsWith("#bridge "))) return true;
             String command = trimmed.substring("#bridge".length()).trim();
             execute(command);
             return false;
