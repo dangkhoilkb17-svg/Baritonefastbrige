@@ -133,7 +133,11 @@ public final class BridgeController {
     private boolean advancePastPlacedTarget() {
         if (plan == null) return false;
         boolean advanced = false;
-        while (currentIndex < plan.orderedTargets().size() && placement.isPlaced(client, plan.orderedTargets().get(currentIndex))) {
+        // Only advance after an interaction has been accepted for this target.
+        // A pre-existing block must not be mistaken for a bridge block.
+        while (pending != null
+                && currentIndex < plan.orderedTargets().size()
+                && placement.isPlaced(client, plan.orderedTargets().get(currentIndex))) {
             currentIndex++; placed++; pending = null; currentAttempts = 0; advanced = true;
         }
         if (!advanced && pending != null && tick - pendingTick >= config.verifyDelayTicks && !placement.isPlaced(client, pending)) {

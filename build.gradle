@@ -13,7 +13,7 @@ repositories {
 
 // Baritone's Fabric API must be supplied separately in libs/.
 // Do NOT bundle/include this JAR into the FastBridge mod.
-def baritoneApiFabricJar = files('libs/baritone-api-fabric-1.11.3.jar')
+def baritoneApiJar = files('libs/baritone-api-1.11.3.jar')
 
 dependencies {
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
@@ -23,7 +23,7 @@ dependencies {
 
     // Compile against the Fabric-compatible Baritone API.
     // Baritone remains a separate runtime mod in the mods folder.
-    compileOnly baritoneApiFabricJar
+    compileOnly baritoneApiJar
 }
 
 processResources {

@@ -18,7 +18,7 @@ public final class BridgePlanner {
         // because it happens to be closer to the player's eyes.
         for (int row = 0; row < length; row++) {
             for (int lane = 0; lane < width; lane++) {
-                int offset = lane - (width / 2);
+                int offset = lane - ((width - 1) / 2);
                 targets.add(origin.offset(forward, row + 1).offset(lateral, offset));
             }
         }
