@@ -11,16 +11,17 @@ repositories {
     maven { url = 'https://maven.fabricmc.net/' }
 }
 
+def baritoneApiJar = files('libs/baritone-api-1.11.3.jar')
+
 dependencies {
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
     mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-    // Keep the exact Baritone 1.11.3 API available to the Java compiler
-    // and package those API classes into the Fast Bridge jar.
-    implementation files('libs/baritone-api-1.11.3.jar')
-    include files('libs/baritone-api-1.11.3.jar')
+    // Compile against the exact Baritone API used by the source.
+    // The runtime Baritone implementation remains a separate mod.
+    compileOnly baritoneApiJar
 }
 
 processResources {
@@ -40,4 +41,10 @@ java {
 
 jar {
     from('LICENSE') { rename { "${it}_${project.base.archivesName.get()}" } }
+
+    // The runtime Baritone 1.11.3 jar used by the launcher does not expose
+    // the API classes to this mod's classloader, so embed only the API package.
+    from({ zipTree(baritoneApiJar.singleFile).matching { include 'baritone/api/**' } }) {
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    }
 }
