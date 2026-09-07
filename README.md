@@ -8,9 +8,9 @@ Client-side Fabric addon for Baritone 1.11.3. It plans a straight, cardinal brid
 - Java 21
 - Fabric Loader 0.16.x
 - Fabric API for 1.21.1
-- Baritone 1.11.3 Fabric
+- Baritone API Fabric 1.11.3
 
-For development, the repository includes the Baritone 1.11.3 API jar at `libs/baritone-api-1.11.3.jar`. The API jar is compile-time only; the built addon does not bundle Baritone itself.
+For development, the repository includes the Fabric-compatible Baritone API mod at `libs/baritone-api-fabric-1.11.3.jar`.
 
 ## Build
 
@@ -35,10 +35,10 @@ Output: `build/libs/baritone-fast-bridge-1.0.0.jar`.
 Copy these mods into `.minecraft/mods/`:
 
 1. Fabric API for Minecraft 1.21.1
-2. Baritone 1.11.3 Fabric runtime distribution
+2. `baritone-api-fabric-1.11.3.jar`
 3. `baritone-fast-bridge-1.0.0.jar`
 
-Do not install the repository's `libs/baritone-api-1.11.3.jar` as the runtime Baritone mod; it is for compilation only.
+Do not install `baritone-standalone-fabric-1.11.3.jar` together with this addon; it uses a different obfuscated API surface.
 
 ## Commands
 
@@ -46,7 +46,6 @@ Do not install the repository's `libs/baritone-api-1.11.3.jar` as the runtime Ba
 - `#bridge 100`
 - `#bridge 100 3`
 - `#bridge auto 3`
-- `#bridge stop`
 - `/bridge` forms are also available as Fabric client commands, including `/bridge auto <width>`.
 
 Length is measured in rows. Total required placements are `length * width`. Width is perpendicular to the initial cardinal facing direction. When a bridge starts, the current camera yaw/pitch is locked until the bridge completes, fails, is cancelled, or the client disconnects.
