@@ -18,6 +18,6 @@
     "minecraft": "~1.21.1",
     "java": ">=21",
     "fabric-api": "*",
-    "baritone": ">=1.11.2"
+    "baritone": ">=1.11.3"
   }
 }
