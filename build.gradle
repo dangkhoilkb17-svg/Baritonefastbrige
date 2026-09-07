@@ -17,8 +17,9 @@ dependencies {
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-    // Compile and package the exact Baritone API used by the source.
-    // The actual Baritone implementation remains a separate runtime mod.
+    // Keep the exact Baritone 1.11.3 API available to the Java compiler
+    // and package those API classes into the Fast Bridge jar.
+    implementation files('libs/baritone-api-1.11.3.jar')
     include files('libs/baritone-api-1.11.3.jar')
 }
 
