@@ -19,8 +19,8 @@ dependencies {
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-    // Compile against the exact Baritone API used by the source.
-    // The runtime Baritone implementation remains a separate mod.
+    // Compile against the exact Baritone 1.11.3 API used by the source.
+    // Baritone itself remains a separate runtime mod in the mods folder.
     compileOnly baritoneApiJar
 }
 
@@ -41,10 +41,4 @@ java {
 
 jar {
     from('LICENSE') { rename { "${it}_${project.base.archivesName.get()}" } }
-
-    // The runtime Baritone 1.11.3 jar used by the launcher does not expose
-    // the API classes to this mod's classloader, so embed only the API package.
-    from({ zipTree(baritoneApiJar.singleFile).matching { include 'baritone/api/**' } }) {
-        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    }
 }
