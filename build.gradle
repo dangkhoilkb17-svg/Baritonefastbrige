@@ -39,5 +39,16 @@ java {
 }
 
 jar {
+    // The standalone runtime omits the named API package. Include the API
+    // interfaces, but leave its Settings/BaritoneAPI bootstrap out because
+    // that bootstrap expects the unremapped development environment.
+    from(zipTree(baritoneApiJar.singleFile)) {
+        exclude 'META-INF/**'
+        exclude 'fabric.mod.json'
+        exclude 'mixins*.json'
+        exclude 'baritone/api/BaritoneAPI.class'
+        exclude 'baritone/api/Settings*.class'
+        exclude 'baritone/api/utils/SettingsUtil*.class'
+    }
     from('LICENSE') { rename { "${it}_${project.base.archivesName.get()}" } }
 }
