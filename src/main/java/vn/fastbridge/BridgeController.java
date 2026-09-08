@@ -5,6 +5,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
 
 public final class BridgeController {
     private final MinecraftClient client = MinecraftClient.getInstance();
@@ -110,6 +111,10 @@ public final class BridgeController {
 
             BlockPos target = plan.orderedTargets().get(currentIndex);
             process.setGoal(target);
+            // Keep Baritone's movement direction usable while the target is
+            // outside placement reach. Placement below replaces this aim with
+            // the exact support-face hit position for the interaction.
+            cameraLock.aimAt(client.player, Vec3d.ofCenter(target));
             if (inventory.select(client, target) < 0) { fail(BridgeStopReason.NO_BLOCKS); return; }
 
             var candidate = placement.candidate(client, target, plan.forward());
