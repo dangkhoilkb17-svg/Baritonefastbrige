@@ -8,9 +8,10 @@ Client-side Fabric addon for Baritone 1.11.3. It plans a straight, cardinal brid
 - Java 21
 - Fabric Loader 0.16.x
 - Fabric API for 1.21.1
-- Baritone API Fabric 1.11.3
+- Baritone API Fabric 1.11.3 from the official Baritone release
 
-For development, the repository includes the Fabric-compatible Baritone API mod at `libs/baritone-api-fabric-1.11.3.jar`.
+The repository does not include third-party Baritone binaries. Download the official
+`baritone-api-fabric-1.11.3.jar` for version 1.11.3 and place it in `libs/`.
 
 ## Build
 
@@ -35,10 +36,12 @@ Output: `build/libs/baritone-fast-bridge-1.0.0.jar`.
 Copy these mods into `.minecraft/mods/`:
 
 1. Fabric API for Minecraft 1.21.1
-2. `baritone-api-fabric-1.11.3.jar`
+2. The official `baritone-api-fabric-1.11.3.jar`
 3. `baritone-fast-bridge-1.0.0.jar`
 
 Do not install `baritone-standalone-fabric-1.11.3.jar` together with this addon; it uses a different obfuscated API surface.
+
+The API JAR is a separate runtime mod and must not be bundled into the addon.
 
 ## Commands
 
