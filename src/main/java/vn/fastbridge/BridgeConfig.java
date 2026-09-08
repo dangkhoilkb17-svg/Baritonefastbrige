@@ -14,7 +14,6 @@ public final class BridgeConfig {
     public int maxLength = 4096;
     public int maxWidth = 7;
     public int placementRetryLimit = 3;
-    public int safetyMargin = 2;
     public boolean useSprint = true;
     public boolean useSneak = false;
     public double reach = 4.5;
@@ -38,7 +37,7 @@ public final class BridgeConfig {
         if (c == null) return new BridgeConfig();
         c.defaultLength = Math.max(1, c.defaultLength); c.defaultWidth = Math.max(1, c.defaultWidth);
         c.maxLength = Math.max(c.defaultLength, c.maxLength); c.maxWidth = Math.max(c.defaultWidth, c.maxWidth);
-        c.placementRetryLimit = Math.max(1, c.placementRetryLimit); c.safetyMargin = Math.max(1, c.safetyMargin);
+        c.placementRetryLimit = Math.max(1, c.placementRetryLimit);
         c.reach = Math.max(3.0, Math.min(6.0, c.reach)); c.verifyDelayTicks = Math.max(1, c.verifyDelayTicks);
         if (c.preferredBlocks == null) c.preferredBlocks = List.of();
         return c;

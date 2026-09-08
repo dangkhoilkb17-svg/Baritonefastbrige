@@ -56,7 +56,7 @@ Length is measured in rows. Total required placements are `length * width`. Widt
 
 ## Configuration
 
-First launch creates `config/baritone-fast-bridge.json` with `defaultLength`, `defaultWidth`, `maxLength`, `maxWidth`, `placementRetryLimit`, `safetyMargin`, `useSprint`, `useSneak`, `reach`, `verifyDelayTicks`, and `preferredBlocks`.
+First launch creates `config/baritone-fast-bridge.json` with `defaultLength`, `defaultWidth`, `maxLength`, `maxWidth`, `placementRetryLimit`, `useSprint`, `useSneak`, `reach`, `verifyDelayTicks`, and `preferredBlocks`.
 
 ## Fast bridge design and limits
 
