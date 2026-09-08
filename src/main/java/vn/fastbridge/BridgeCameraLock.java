@@ -5,7 +5,6 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 
-/** Owns the view while the bridge is active and aims at the predicted placement face. */
 public final class BridgeCameraLock {
     private static volatile boolean globallyLocked;
 
@@ -24,7 +23,6 @@ public final class BridgeCameraLock {
         apply(player);
     }
 
-    /** Instantly aim at the exact hit position selected by the placement planner. */
     public void aimAt(ClientPlayerEntity player, Vec3d target) {
         if (player == null || target == null) return;
         if (!locked) lock(player);

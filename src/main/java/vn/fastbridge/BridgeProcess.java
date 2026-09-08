@@ -5,10 +5,6 @@ import baritone.api.pathing.goals.Goal;
 import baritone.api.process.ICustomGoalProcess;
 import net.minecraft.util.math.BlockPos;
 
-/**
- * Baritone remains the primary pathing and movement controller.
- * Fast Bridge only supplies the next bridge target; it never injects movement inputs.
- */
 public final class BridgeProcess {
     private final ICustomGoalProcess goalProcess;
     private boolean active;
@@ -45,10 +41,6 @@ public final class BridgeProcess {
         return goal;
     }
 
-    /**
-     * Equivalent to Baritone's GoalGetToBlock without depending on the
-     * mapping-specific classes bundled in the standalone API jar.
-     */
     private static final class AdjacentBlockGoal implements Goal {
         private final int x;
         private final int y;
