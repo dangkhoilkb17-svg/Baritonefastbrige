@@ -28,7 +28,7 @@ public final class BridgeController {
         this.config = config;
         inventory = new BridgeInventoryManager(config);
         placement = new BridgePlacementController(config);
-        safety = new BridgeSafetyManager(config);
+        safety = new BridgeSafetyManager();
         process = new BridgeProcess(baritone);
     }
 
