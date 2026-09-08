@@ -10,6 +10,9 @@ build/
 # Java
 *.class
 
+# External mod dependencies
+libs/*.jar
+
 # Local/runtime
 run/
 logs/

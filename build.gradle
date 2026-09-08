@@ -11,7 +11,15 @@ repositories {
     maven { url = 'https://maven.fabricmc.net/' }
 }
 
-def baritoneApiJar = files('libs/baritone-api-fabric-1.11.3.jar')
+def baritoneApiPath = providers.gradleProperty('baritone_api_jar')
+    .getOrElse('libs/baritone-api-fabric-1.11.3.jar')
+def baritoneApiJar = files(baritoneApiPath)
+if (!baritoneApiJar.singleFile.exists()) {
+    throw new GradleException(
+        "Missing Baritone API JAR. Download the official Fabric 1.11.3 artifact " +
+        "and place it at '${baritoneApiPath}', or pass -Pbaritone_api_jar=<path>."
+    )
+}
 
 dependencies {
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
