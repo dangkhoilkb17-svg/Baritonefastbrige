@@ -22,7 +22,6 @@ public final class BaritoneFastBridge implements ClientModInitializer {
         LOGGER.info("Baritone Fast Bridge initialized");
     }
 
-    /** Emergency stop used by the hard input lock. F8 always releases bridge control. */
     public static void emergencyStop() {
         if (controller != null && controller.active()) {
             controller.stop();

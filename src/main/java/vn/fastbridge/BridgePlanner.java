@@ -13,9 +13,6 @@ public final class BridgePlanner {
         BlockPos origin = player.getBlockPos().down();
         List<BlockPos> targets = new ArrayList<>(length * width);
 
-        // Deterministic order: complete every lane of row 0 before row 1, etc.
-        // This prevents the controller from jumping to a different target just
-        // because it happens to be closer to the player's eyes.
         for (int row = 0; row < length; row++) {
             for (int lane = 0; lane < width; lane++) {
                 int offset = lane - ((width - 1) / 2);

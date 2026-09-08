@@ -30,9 +30,6 @@ public final class BridgePlacementController {
             if (preferred.isPresent()) return preferred;
         }
 
-        // Fallback order: horizontal sides first, then vertical faces. This keeps
-        // normal bridge placement preferred while still allowing recovery around
-        // uneven terrain.
         Direction[] order = {Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST, Direction.UP, Direction.DOWN};
         for (Direction side : order) {
             Optional<PlacementCandidate> candidate = fromSupport(c, target, target.offset(side), side.getOpposite());

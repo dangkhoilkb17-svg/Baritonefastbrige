@@ -51,7 +51,6 @@ public final class BridgeController {
         message("Fast Bridge started: length=" + length + ", width=" + width + ". Predictive camera/input lock active. Press F8 for emergency stop. Baritone controls movement.");
     }
 
-    /** Finds the first full-width solid row and bridges the gap before it. */
     public void autoStart(int width) {
         if (client.player == null || client.world == null) { message("Bridge unavailable: not in a world."); return; }
         if (width < 1 || width > config.maxWidth) {
@@ -131,8 +130,6 @@ public final class BridgeController {
     private boolean advancePastPlacedTarget() {
         if (plan == null) return false;
         boolean advanced = false;
-        // Only advance after an interaction has been accepted for this target.
-        // A pre-existing block must not be mistaken for a bridge block.
         while (pending != null
                 && currentIndex < plan.orderedTargets().size()
                 && placement.isPlaced(client, plan.orderedTargets().get(currentIndex))) {

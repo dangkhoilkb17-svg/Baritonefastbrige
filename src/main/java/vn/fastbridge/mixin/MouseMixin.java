@@ -25,7 +25,6 @@ public abstract class MouseMixin {
         if (!BridgeInputLock.isLocked()) return;
 
         MinecraftClient client = MinecraftClient.getInstance();
-        // GUI input is allowed so the chat screen can still be used to issue #bridge stop.
         if (client.currentScreen == null) ci.cancel();
     }
 
