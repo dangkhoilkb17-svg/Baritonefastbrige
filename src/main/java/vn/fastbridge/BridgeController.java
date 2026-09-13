@@ -45,10 +45,9 @@ public final class BridgeController {
         pending = null;
         state = BridgeState.PREPARING;
         BridgeInputLock.lock(client);
-        cameraLock.lock(client.player);
         process.setActive(true);
         process.setGoal(plan.orderedTargets().get(0));
-        message("Fast Bridge started: length=" + length + ", width=" + width + ". Predictive camera/input lock active. Press F8 for emergency stop. Baritone controls movement.");
+        message("Fast Bridge started: length=" + length + ", width=" + width + ". Baritone controls movement and camera; Fast Bridge controls placement aiming only when needed. Press F8 for emergency stop.");
     }
 
     public void autoStart(int width) {
@@ -112,15 +111,19 @@ public final class BridgeController {
 
             var candidate = placement.candidate(client, target, plan.forward());
             if (candidate.isPresent()) {
+                cameraLock.lock(client.player);
                 cameraLock.aimAt(client.player, candidate.get().hit().getPos());
                 if (placement.interact(client, candidate.get())) {
                     pending = target;
                     pendingTick = tick;
                     currentAttempts = 0;
-                } else if (++currentAttempts > config.placementRetryLimit) { fail(BridgeStopReason.NO_VALID_PLACEMENT); return; }
+                    cameraLock.unlock();
+                } else if (++currentAttempts > config.placementRetryLimit) { cameraLock.unlock(); fail(BridgeStopReason.NO_VALID_PLACEMENT); return; }
+                else cameraLock.unlock();
             } else if (++currentAttempts > config.placementRetryLimit) { fail(BridgeStopReason.NO_VALID_PLACEMENT); return; }
             advancePastPlacedTarget();
         } catch (RuntimeException e) {
+            cameraLock.unlock();
             BaritoneFastBridge.LOGGER.error("Bridge tick failed", e);
             fail(BridgeStopReason.INTERNAL_ERROR);
         }
