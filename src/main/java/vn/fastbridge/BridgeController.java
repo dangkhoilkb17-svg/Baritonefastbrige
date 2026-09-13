@@ -117,7 +117,6 @@ public final class BridgeController {
                     pending = target;
                     pendingTick = tick;
                     currentAttempts = 0;
-                    if (currentIndex + 1 < plan.orderedTargets().size()) process.setGoal(plan.orderedTargets().get(currentIndex + 1));
                 } else if (++currentAttempts > config.placementRetryLimit) { fail(BridgeStopReason.NO_VALID_PLACEMENT); return; }
             } else if (++currentAttempts > config.placementRetryLimit) { fail(BridgeStopReason.NO_VALID_PLACEMENT); return; }
             advancePastPlacedTarget();
@@ -134,6 +133,9 @@ public final class BridgeController {
                 && currentIndex < plan.orderedTargets().size()
                 && placement.isPlaced(client, plan.orderedTargets().get(currentIndex))) {
             currentIndex++; placed++; pending = null; currentAttempts = 0; advanced = true;
+            if (currentIndex < plan.orderedTargets().size()) {
+                process.setGoal(plan.orderedTargets().get(currentIndex));
+            }
         }
         if (!advanced && pending != null && tick - pendingTick >= config.verifyDelayTicks && !placement.isPlaced(client, pending)) {
             pending = null;
