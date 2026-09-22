@@ -1,22 +1,7 @@
-# Gradle
-.gradle/
-build/
-
 # IDE
 .idea/
 .vscode/
 *.iml
-
-# Java
-*.class
-
-# External mod dependencies
-libs/*.jar
-
-# Local/runtime
-run/
-logs/
-crash-reports/
 
 # OS
 .DS_Store
