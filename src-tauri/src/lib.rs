@@ -7,8 +7,11 @@ use std::io::Cursor;
 #[derive(Debug, Deserialize)]
 #[serde(tag = "kind", rename_all = "lowercase")]
 pub enum CaptureMode {
-    Fullscreen,
+    Fullscreen {
+        display_id: u32,
+    },
     Region {
+        display_id: u32,
         x: i32,
         y: i32,
         width: u32,
@@ -31,6 +34,25 @@ struct Region {
     height: u32,
 }
 
+#[derive(Debug, Serialize)]
+pub struct Display {
+    pub id: u32,
+    pub width: u32,
+    pub height: u32,
+    pub is_primary: bool,
+}
+
+fn select_display(displays: Vec<Screen>, display_id: u32) -> Result<Screen, String> {
+    displays
+        .into_iter()
+        .find(|screen| display_matches(screen.display_info.id, display_id))
+        .ok_or_else(|| format!("Display {display_id} is not available"))
+}
+
+fn display_matches(candidate_id: u32, requested_id: u32) -> bool {
+    candidate_id == requested_id
+}
+
 fn validate_region(x: i32, y: i32, width: u32, height: u32) -> Result<Region, String> {
     if x < 0 || y < 0 {
         return Err("Region coordinates cannot be negative".into());
@@ -47,17 +69,38 @@ fn validate_region(x: i32, y: i32, width: u32, height: u32) -> Result<Region, St
 }
 
 #[tauri::command]
+fn list_displays() -> Result<Vec<Display>, String> {
+    Screen::all()
+        .map_err(|error| format!("Unable to enumerate displays: {error}"))
+        .map(|screens| {
+            screens
+                .into_iter()
+                .map(|screen| Display {
+                    id: screen.display_info.id,
+                    width: screen.display_info.width,
+                    height: screen.display_info.height,
+                    is_primary: screen.display_info.is_primary,
+                })
+                .collect()
+        })
+}
+
+#[tauri::command]
 fn capture_screenshot(mode: CaptureMode) -> Result<CaptureResult, String> {
-    let screen = Screen::all()
-        .map_err(|error| format!("Unable to enumerate displays: {error}"))?
-        .into_iter()
-        .next()
-        .ok_or_else(|| "No display is available".to_string())?;
+    let display_id = match mode {
+        CaptureMode::Fullscreen { display_id } | CaptureMode::Region { display_id, .. } => {
+            display_id
+        }
+    };
+    let screen = select_display(
+        Screen::all().map_err(|error| format!("Unable to enumerate displays: {error}"))?,
+        display_id,
+    )?;
     let image = screen
         .capture()
         .map_err(|error| format!("Unable to capture display: {error}"))?;
     let (rgba, width, height) = match mode {
-        CaptureMode::Fullscreen => {
+        CaptureMode::Fullscreen { .. } => {
             let width = image.width();
             let height = image.height();
             let rgba = RgbaImage::from_raw(width, height, image.as_raw().to_vec())
@@ -65,6 +108,7 @@ fn capture_screenshot(mode: CaptureMode) -> Result<CaptureResult, String> {
             (rgba, width, height)
         }
         CaptureMode::Region {
+            display_id: _,
             x,
             y,
             width,
@@ -103,7 +147,7 @@ fn capture_screenshot(mode: CaptureMode) -> Result<CaptureResult, String> {
 
 pub fn run() {
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![capture_screenshot])
+        .invoke_handler(tauri::generate_handler![capture_screenshot, list_displays])
         .run(tauri::generate_context!())
         .expect("error while running screenshot MVP");
 }
@@ -130,5 +174,16 @@ mod tests {
         assert!(validate_region(-1, 0, 10, 10).is_err());
         assert!(validate_region(0, 0, 0, 10).is_err());
         assert!(validate_region(0, 0, 10, 0).is_err());
+    }
+
+    #[test]
+    fn matches_requested_display_id() {
+        assert!(display_matches(10, 10));
+        assert!(!display_matches(10, 11));
+    }
+
+    #[test]
+    fn rejects_unknown_display_id() {
+        assert!(select_display(Vec::new(), 10).is_err());
     }
 }
